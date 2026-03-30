@@ -6,18 +6,73 @@ importScripts("/js/function.js", "/js/init.js");
 chrome.webNavigation.onBeforeNavigate.addListener(function () { return; });
 chrome.webNavigation.onHistoryStateUpdated.addListener(function () { return; });
 chrome.runtime.onConnect.addListener(function (Port) {
-    if (chrome.runtime.lastError || Port.name !== "HeartBeat") return;
-    Port.postMessage("HeartBeat");
-    Port.onMessage.addListener(function (message, Port) { return; });
-    const interval = setInterval(function () {
-        clearInterval(interval);
-        Port.disconnect();
-    }, 250000);
+    if (chrome.runtime.lastError) { return; }
+    if (Port.name == "HeartBeat") {
+        Port.postMessage("HeartBeat");
+        Port.onMessage.addListener(function (message, Port) { return; });
+        const interval = setInterval(function () {
+            clearInterval(interval);
+            Port.disconnect();
+        }, 250000);
+        Port.onDisconnect.addListener(function () {
+            interval && clearInterval(interval);
+            if (chrome.runtime.lastError) { return; }
+        });
+        return;
+    }
+    if (Port.name != "Mediabunny") { return; }
+
+    G.ffmpegConfig.runnerPort = Port;
+    G.ffmpegConfig.ready = false;
+    G.ffmpegConfig.tab = Port.sender?.tab?.id ?? G.ffmpegConfig.tab;
+
+    Port.onMessage.addListener(function (message) {
+        if (!message || message.type != "ready") { return; }
+        G.ffmpegConfig.ready = true;
+        G.ffmpegConfig.tab = Port.sender?.tab?.id ?? G.ffmpegConfig.tab;
+        flushFfmpegQueue();
+    });
     Port.onDisconnect.addListener(function () {
-        interval && clearInterval(interval);
+        if (G.ffmpegConfig.runnerPort !== Port) { return; }
+        G.ffmpegConfig.runnerPort = null;
+        G.ffmpegConfig.ready = false;
         if (chrome.runtime.lastError) { return; }
     });
 });
+
+function flushFfmpegQueue() {
+    if (!G.ffmpegConfig.ready || !G.ffmpegConfig.runnerPort) { return; }
+    while (G.ffmpegConfig.cacheData.length) {
+        G.ffmpegConfig.runnerPort.postMessage({ type: "job", job: G.ffmpegConfig.cacheData.shift() });
+    }
+}
+
+function ensureFfmpegRunner(active = true) {
+    chrome.tabs.query({ url: G.ffmpegConfig.urlPattern }, function (tabs) {
+        if (chrome.runtime.lastError) { return; }
+        if (tabs.length) {
+            G.ffmpegConfig.tab = tabs[0].id;
+            if (active) {
+                chrome.tabs.update(tabs[0].id, { active: true });
+            }
+            flushFfmpegQueue();
+            return;
+        }
+        chrome.tabs.create({ url: G.ffmpegConfig.url, active: active }, function (tab) {
+            if (chrome.runtime.lastError || !tab) { return; }
+            G.ffmpegConfig.tab = tab.id;
+        });
+    });
+}
+
+function queueFfmpegJob(data, active = true) {
+    G.ffmpegConfig.cacheData.push(data);
+    if (G.ffmpegConfig.ready && G.ffmpegConfig.runnerPort) {
+        flushFfmpegQueue();
+        return;
+    }
+    ensureFfmpegRunner(active);
+}
 
 /**
  *  定时任务
@@ -515,23 +570,13 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // ffmpeg网页通信
     if (Message.Message == "catCatchFFmpeg") {
-        const data = { ...Message, Message: "ffmpeg", tabId: Message.tabId ?? sender.tab.id, version: G.ffmpegConfig.version };
-        chrome.tabs.query({ url: G.ffmpegConfig.url + "*" }, function (tabs) {
-            if (chrome.runtime.lastError || !tabs.length) {
-                chrome.tabs.create({ url: G.ffmpegConfig.url, active: Message.active ?? true }, function (tab) {
-                    if (chrome.runtime.lastError) { return; }
-                    G.ffmpegConfig.tab = tab.id;
-                    G.ffmpegConfig.cacheData.push(data);
-                });
-                return true;
-            }
-            if (tabs[0].status == "complete") {
-                chrome.tabs.sendMessage(tabs[0].id, data);
-            } else {
-                G.ffmpegConfig.tab = tabs[0].id;
-                G.ffmpegConfig.cacheData.push(data);
-            }
-        });
+        const data = {
+            ...Message,
+            Message: "ffmpeg",
+            tabId: Message.tabId ?? sender.tab?.id ?? G.tabId,
+            version: G.ffmpegConfig.version
+        };
+        queueFfmpegJob(data, Message.active ?? true);
         sendResponse("ok");
         return true;
     }
@@ -584,6 +629,10 @@ chrome.windows.onFocusChanged.addListener(function (activeInfo) {
  * 检查 是否在屏蔽列表中
  */
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    if (changeInfo.url && G.ffmpegConfig.tab == tabId && G.ffmpegConfig.isLegacyUrl(changeInfo.url)) {
+        chrome.tabs.update(tabId, { url: G.ffmpegConfig.url });
+        return;
+    }
     if (isSpecialPage(tab.url) || tabId <= 0 || !G.initSyncComplete) { return; }
     // console.log('onUpdated', tabId, changeInfo, tab);
     if (changeInfo.status && changeInfo.status == "loading" && G.autoClearMode == 2) {
@@ -745,13 +794,7 @@ chrome.commands.onCommand.addListener(function (command) {
  */
 chrome.webNavigation.onCompleted.addListener(function (details) {
     if (G.ffmpegConfig.tab && details.tabId == G.ffmpegConfig.tab) {
-        setTimeout(() => {
-            G.ffmpegConfig.cacheData.forEach(data => {
-                chrome.tabs.sendMessage(details.tabId, data);
-            });
-            G.ffmpegConfig.cacheData = [];
-            G.ffmpegConfig.tab = 0;
-        }, 500);
+        flushFfmpegQueue();
     }
 });
 

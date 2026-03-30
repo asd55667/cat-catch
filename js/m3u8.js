@@ -1160,7 +1160,7 @@ $("#mergeTs").click(async function () {
 
     // 提前打开ffmpeg
     // _ffmpeg && createIframeFFmpeg();
-    if (_ffmpeg || $("#ffmpeg").prop("checked")) {
+    if (G.iframeFFmpeg && (_ffmpeg || $("#ffmpeg").prop("checked"))) {
         _isMaster == 1 && createIframeFFmpeg();
     }
 

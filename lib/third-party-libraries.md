@@ -62,3 +62,11 @@ Download:
 lib/m3u8-decrypt.js
 Source: https://github.com/video-dev/hls.js/blob/master/src/crypt/aes-decryptor.ts
 License: Apache-2.0 license
+
+lib/mediabunny.min.cjs
+Source: https://github.com/Vanilagy/mediabunny
+License: MPL-2.0 license
+Version: 1.40.1
+Download:
+`npm pack mediabunny@1.40.1`
+`package/dist/bundles/mediabunny.min.cjs`

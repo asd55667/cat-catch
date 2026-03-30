@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Mediabunny</title>
+  <link rel="stylesheet" type="text/css" href="css/public.css" media="all" />
+  <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
+  <style>
+    body {
+      background: #f6f4ef;
+    }
+
+    .mediabunnyPanel {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+
+    .mediabunnyStatus {
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 12px;
+      word-break: break-word;
+    }
+
+    .mediabunnyCurrent {
+      color: #666;
+      margin-bottom: 12px;
+      min-height: 24px;
+      word-break: break-word;
+    }
+
+    .mediabunnyQueue {
+      margin-top: 16px;
+    }
+
+    .mediabunnyQueue ul {
+      margin: 12px 0 0;
+      padding-left: 20px;
+    }
+
+    .mediabunnyQueue li {
+      margin-bottom: 8px;
+      word-break: break-word;
+    }
+
+    .mediabunnyLog {
+      width: 100%;
+      min-height: 180px;
+      margin-top: 16px;
+      padding: 12px;
+      border: 1px solid #d9d4c7;
+      border-radius: 8px;
+      background: #fffdf8;
+      color: #444;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      resize: vertical;
+      white-space: pre-wrap;
+      box-sizing: border-box;
+    }
+  </style>
+  <script src="lib/mediabunny.min.cjs"></script>
+  <script src="js/mediabunny.js" defer></script>
+</head>
+
+<body>
+  <div class="mediabunnyPanel wrapper1080">
+    <section>
+      <h1 class="optionsTitle">Mediabunny</h1>
+      <div class="optionBox">
+        <div id="status" class="mediabunnyStatus">Waiting for media...</div>
+        <div id="currentJob" class="mediabunnyCurrent"></div>
+        <div class="merge">
+          <button id="processManualQueue" type="button">Create Single File</button>
+          <button id="clearManualQueue" type="button">Clear Staged Files</button>
+        </div>
+        <div id="manualSummary" class="mediabunnyQueue"></div>
+        <div id="manualQueue" class="mediabunnyQueue"></div>
+        <textarea id="log" class="mediabunnyLog" spellcheck="false" readonly></textarea>
+      </div>
+    </section>
+  </div>
+</body>
+
+</html>

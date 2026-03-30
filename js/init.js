@@ -222,9 +222,22 @@ G.scriptList.set("webrtc.js", { key: "webrtc", refresh: true, allFrames: true, w
 G.ffmpegConfig = {
     tab: 0,
     cacheData: [],
-    version: 1,
+    runnerPort: null,
+    ready: false,
+    version: 2,
     get url() {
-        return G.onlineServiceAddress == 0 ? "https://ffmpeg.bmmmd.com/" : "https://ffmpeg.94cat.com/";
+        return chrome.runtime.getURL("mediabunny.html");
+    },
+    get urlPattern() {
+        return this.url + "*";
+    },
+    isLegacyUrl(url) {
+        try {
+            const target = new URL(url);
+            return ["ffmpeg.bmmmd.com", "ffmpeg.94cat.com"].includes(target.hostname) && target.pathname != "/mitm.html";
+        } catch (e) {
+            return false;
+        }
     }
 }
 // streamSaver 边下边存
