@@ -765,7 +765,7 @@
                 const type = mime.split('/')[0] || 'video';
 
                 media.push({
-                    data: (typeof chrome == "object") ? URL.createObjectURL(fileBlob) : fileBlob,
+                    data: fileBlob,
                     type: type
                 });
             }

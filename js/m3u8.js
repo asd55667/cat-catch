@@ -840,7 +840,7 @@ $("#originalM3U8").click(function () {
 $("#getTs").click(function () {
     showTab("#mediaList");
 });
-// 在线ffmpeg
+// 本地合成
 $("#onlineFFmpeg").click(function () {
     !iframeFFmpeg && createIframeFFmpeg();
     showTab("#iframeBox");
@@ -1256,7 +1256,7 @@ $("details summary").click(function () {
     chrome.storage.local.set(allOption);
 });
 
-// 发送到在线ffmpeg
+// 发送到本地合成
 $("#sendFfmpeg").click(function () {
     isSendFfmpeg = true;
     $("#StreamSaver").prop("checked", false);
@@ -1666,39 +1666,25 @@ function mergeTsNew(down) {
             data.taskId = _taskId;
         }
 
-        // 使用iframe传输
-        if (G.iframeFFmpeg) {
+        // 转数据结构
+        const fileData = {
+            ...data,
+            data: fileBlob,
+            version: G.ffmpegConfig.version
+        };
 
-            // 转数据结构
-            const fileData = {
-                ...data,
-                data: fileBlob,
-                version: G.ffmpegConfig.version
-            };
-
-            if (_ffmpeg == "merge" && _isMaster != 1) {
-                channel.postMessage({
-                    Message: "mergeData",
-                    data: fileData
-                });
-                return;
-            }
-
-            document.querySelector("#onlineFFmpeg").style.display = "block";
-            createIframeFFmpeg(fileData);
-            showTab("#iframeBox");
+        if (_ffmpeg == "merge" && _isMaster != 1) {
+            channel.postMessage({
+                Message: "mergeData",
+                data: fileData
+            });
             return;
         }
-        chrome.runtime.sendMessage(data, function (response) {
-            if (!chrome.runtime?.lastError && response && response == "ok") {
-                $progress.html(i18n.sendFfmpeg);
-                buttonState("#mergeTs", true);
-                return;
-            }
-            apiDownload(fileBlob, fileName, ext);
-            down.destroy();
-            return;
-        });
+
+        document.querySelector("#onlineFFmpeg").style.display = "block";
+        createIframeFFmpeg(fileData);
+        showTab("#iframeBox");
+        return;
     } else {
         apiDownload(fileBlob, fileName, ext);
         down.destroy();

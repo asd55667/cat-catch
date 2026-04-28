@@ -48,24 +48,16 @@ function flushFfmpegQueue() {
 }
 
 function ensureFfmpegRunner(active = true) {
-    chrome.tabs.query({ url: G.ffmpegConfig.urlPattern }, function (tabs) {
-        if (chrome.runtime.lastError) { return; }
-        if (tabs.length) {
-            G.ffmpegConfig.tab = tabs[0].id;
-            if (active) {
-                chrome.tabs.update(tabs[0].id, { active: true });
-            }
-            flushFfmpegQueue();
-            return;
-        }
-        chrome.tabs.create({ url: G.ffmpegConfig.url, active: active }, function (tab) {
-            if (chrome.runtime.lastError || !tab) { return; }
-            G.ffmpegConfig.tab = tab.id;
-        });
-    });
+    flushFfmpegQueue();
 }
 
-function queueFfmpegJob(data, active = true) {
+function queueFfmpegJob(data, active = true, sender = null) {
+    if (sender?.tab?.id && sender.url && !sender.url.startsWith(chrome.runtime.getURL(""))) {
+        chrome.tabs.sendMessage(sender.tab.id, { ...data, Message: "ffmpeg" }, function () {
+            if (chrome.runtime.lastError) { return; }
+        });
+        return;
+    }
     G.ffmpegConfig.cacheData.push(data);
     if (G.ffmpegConfig.ready && G.ffmpegConfig.runnerPort) {
         flushFfmpegQueue();
@@ -576,7 +568,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             tabId: Message.tabId ?? sender.tab?.id ?? G.tabId,
             version: G.ffmpegConfig.version
         };
-        queueFfmpegJob(data, Message.active ?? true);
+        queueFfmpegJob(data, Message.active ?? true, sender);
         sendResponse("ok");
         return true;
     }
@@ -789,8 +781,7 @@ chrome.commands.onCommand.addListener(function (command) {
 });
 
 /**
- * 监听 页面完全加载完成 判断是否在线ffmpeg页面
- * 如果是在线ffmpeg 则发送数据
+ * 监听页面完全加载完成，兼容旧 runner port 队列
  */
 chrome.webNavigation.onCompleted.addListener(function (details) {
     if (G.ffmpegConfig.tab && details.tabId == G.ffmpegConfig.tab) {

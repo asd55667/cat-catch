@@ -522,7 +522,7 @@
     "message": "Thư mục tải xuống"
   },
   "sendFfmpeg": {
-    "message": "Gửi đến ffmpeg trực tuyến"
+    "message": "Send to local muxer"
   },
   "autoCloserDownload": {
     "message": "Tự động đóng trang sau khi tải xong"

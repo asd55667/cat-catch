@@ -522,7 +522,7 @@
     "message": "打载目录"
   },
   "sendFfmpeg": {
-    "message": "发送到在线ffmpeg"
+    "message": "发送到本地合成"
   },
   "autoCloserDownload": {
     "message": "下载完自动关闭页面"
@@ -678,7 +678,7 @@
     "message": "无视频"
   },
   "hevcTip": {
-    "message": "HEVC/H.265编码切片文件 只支持在线ffmpeg转码"
+    "message": "HEVC/H.265编码切片文件只支持本地合成转码"
   },
   "hevcPreviewTip": {
     "message": "HEVC/H.265编码切片文件 不支持预览"
@@ -787,7 +787,7 @@
     "message": "合并中"
   },
   "fileTooLarge": {
-    "message": "文件大于$size$ 无法使用在线ffmpeg, 正在下载合并文件, 文件较大请耐心等待",
+    "message": "文件大于$size$ 无法使用本地合成, 正在下载合并文件, 文件较大请耐心等待",
     "placeholders": {
       "size": {
         "content": "$1"
@@ -1020,12 +1020,12 @@
     "message": "该网站要求禁止运行本程序"
   },
   "onlineFFmpeg": {
-    "message": "在线ffmpeg"
+    "message": "本地合成"
   },
   "ffmpegIsNotReady": {
-    "message": "在线ffmpeg服务未就绪, 请稍后再试"
+    "message": "本地合成服务未就绪, 请稍后再试"
   },
   "iframeFFmpeg": {
-    "message": "嵌套在线ffmpeg"
+    "message": "本地页面内合成"
   }
 }

@@ -522,7 +522,7 @@
     "message": "İndirme Dizini"
   },
   "sendFfmpeg": {
-    "message": "Çevrimiçi ffmpeg'e Gönder"
+    "message": "Send to local muxer"
   },
   "autoCloserDownload": {
     "message": "İndirmeden Sonra Sayfayı Otomatik Kapat"

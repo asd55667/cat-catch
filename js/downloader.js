@@ -4,7 +4,7 @@ const _requestId = params.get("requestId") ? params.get("requestId").split(",") 
 const _ffmpeg = params.get("ffmpeg");   // 启用在线FFmpeg
 let _downStream = params.get("downStream"); // 启用边下边存 流式下载
 const _data = [];   // 通过_requestId获取得到得数据
-const _taskId = Date.parse(new Date()); // 配合ffmpeg使用的任务ID 以便在线ffmpeg通过ID知道文件属于哪些任务
+const _taskId = Date.parse(new Date()); // 配合本地合成使用的任务ID
 let _tabId = null;  // 当前页面tab id
 let _index = null;  // 当前页面 tab index
 
@@ -89,15 +89,7 @@ const createIframeFFmpeg = (callback) => {
 function start() {
     // 提前打开ffmpeg页面
     if (_ffmpeg) {
-        if (G.iframeFFmpeg) {
-            createIframeFFmpeg();
-        } else {
-            chrome.runtime.sendMessage({
-                Message: "catCatchFFmpeg",
-                action: "openFFmpeg",
-                extra: i18n.waitingForMedia
-            });
-        }
+        createIframeFFmpeg();
     }
 
     $("#autoClose").prop("checked", G.downAutoClose);
@@ -334,7 +326,7 @@ function start() {
             return;
         }
 
-        // 以下为在线ffmpeg返回结果
+        // 以下为本地合成返回结果
         if (Message.Message != "catCatchFFmpegResult" || _tabId == 0 || Message.tabId != _tabId) { return; }
 
         // 发送状态提示
@@ -399,71 +391,32 @@ function start() {
  * @param {ArrayBuffer|Blob} data 数据内容
  * @param {Object} fragment 数据对象
  */
-let isCreatingTab = false;
 function sendFile(action, data, fragment) {
     // 转 blob
     if (data instanceof ArrayBuffer) {
         data = ArrayBufferToBlob(data, { type: fragment.contentType });
     }
 
-    // 嵌套在线ffmpeg模式
-    if (G.iframeFFmpeg) {
-        document.querySelector("#iframeBox").style.display = "block";
-        const baseData = {
-            action: action,
-            title: stringModify(fragment.title),
-            tabId: _tabId,
-            data: data,
-            version: G.ffmpegConfig.version,
-            index: fragment.index
-        };
-        if (action === "merge") {
-            baseData.taskId = _taskId;
-            baseData.quantity = _data.length;
-        }
-        if (!iframeFFmpeg) {
-            createIframeFFmpeg(() => {
-                iframeFFmpeg.contentWindow.postMessage(baseData, '*');
-            });
-        } else if (iframeFFmpegReady) {
-            iframeFFmpeg.contentWindow.postMessage(baseData, '*');
-        } else {
-            setTimeout(sendFile, 500, action, data, fragment);
-        }
-        return;
+    document.querySelector("#iframeBox").style.display = "block";
+    const baseData = {
+        action: action,
+        title: stringModify(fragment.title),
+        tabId: _tabId,
+        data: data,
+        version: G.ffmpegConfig.version,
+        index: fragment.index
+    };
+    if (action === "merge") {
+        baseData.taskId = _taskId;
+        baseData.quantity = _data.length;
     }
-
-    chrome.tabs.query({ url: G.ffmpegConfig.url + "*" }, function (tabs) {
-        // 等待ffmpeg 打开并且可用
-        if (tabs.length === 0) {
-            if (!isCreatingTab) {
-                isCreatingTab = true; // 设置创建标志位
-                chrome.tabs.create({ url: G.ffmpegConfig.url });
-            }
-            setTimeout(sendFile, 500, action, data, fragment);
-            return;
-        } else if (tabs[0].status !== "complete") {
-            setTimeout(sendFile, 233, action, data, fragment);
-            return;
-        }
-        isCreatingTab = false; // 重置创建标志位
-        /**
-         * https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Chrome_incompatibilities#data_cloning_algorithm
-         * chrome.runtime.sendMessage API
-         * chrome 的对象参数需要序列化 无法传递Blob
-         * firefox 可以直接传递Blob
-         */
-        const baseData = {
-            Message: "catCatchFFmpeg",
-            action: action,
-            files: [{ data: G.isFirefox ? data : URL.createObjectURL(data), name: getUrlFileName(fragment.url), index: fragment.index }],
-            title: stringModify(fragment.title),
-            tabId: _tabId
-        };
-        if (action === "merge") {
-            baseData.taskId = _taskId;
-            baseData.quantity = _data.length;
-        }
-        chrome.runtime.sendMessage(baseData);
-    });
+    if (!iframeFFmpeg) {
+        createIframeFFmpeg(() => {
+            iframeFFmpeg.contentWindow.postMessage(baseData, '*');
+        });
+    } else if (iframeFFmpegReady) {
+        iframeFFmpeg.contentWindow.postMessage(baseData, '*');
+    } else {
+        setTimeout(sendFile, 500, action, data, fragment);
+    }
 }

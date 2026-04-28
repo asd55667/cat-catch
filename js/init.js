@@ -193,7 +193,7 @@ G.OptionLists = {
     mqttDataFormat: "",
     getHtmlDOM: false,
     damn: false,
-    iframeFFmpeg: false,
+    iframeFFmpeg: true,
 };
 
 // 本地储存的配置
@@ -331,6 +331,10 @@ function InitOptions() {
             items.m3u8dl = items.m3u8dl ? 1 : 0;
             chrome.storage.sync.set({ m3u8dl: items.m3u8dl });
         }
+        if (!items.iframeFFmpeg) {
+            items.iframeFFmpeg = true;
+            chrome.storage.sync.set({ iframeFFmpeg: true });
+        }
 
         // 侧边栏
         chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: items.sidePanel });
@@ -408,6 +412,11 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
         }
         if (key == "sidePanel" && !G.isFirefox) {
             chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: newValue });
+            continue;
+        }
+        if (key == "iframeFFmpeg" && !newValue) {
+            chrome.storage.sync.set({ iframeFFmpeg: true });
+            G.iframeFFmpeg = true;
             continue;
         }
         G[key] = newValue;

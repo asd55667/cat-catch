@@ -75,6 +75,16 @@
       "all_frames": true
     }
   ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "mediabunny.html"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
   "default_locale": "en",
   "version": "2.6.7",
   "incognito": "split"

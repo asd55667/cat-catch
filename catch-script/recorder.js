@@ -266,7 +266,7 @@
                     window.postMessage({
                         action: "catCatchFFmpeg",
                         use: "transcode",
-                        files: [{ data: URL.createObjectURL(event.data), type: option.mimeType }],
+                        files: [{ data: event.data, type: option.mimeType }],
                         title: document.title.trim()
                     });
                     $tips.innerHTML = i18n("clickToStartRecording", "请点击开始录制");

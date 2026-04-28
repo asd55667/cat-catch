@@ -2,6 +2,95 @@
     var _videoObj = [];
     var _videoSrc = [];
     var _key = new Set();
+    var _mediabunnyFrame = null;
+    var _mediabunnyFrameReady = false;
+    var _mediabunnyFrameCallbacks = [];
+    var _mediabunnyFrameQueue = [];
+
+    function ensureMediabunnyFrame() {
+        return new Promise(function (resolve) {
+            if (_mediabunnyFrameReady && _mediabunnyFrame?.contentWindow) {
+                resolve();
+                return;
+            }
+            _mediabunnyFrameCallbacks.push(resolve);
+            if (_mediabunnyFrame) { return; }
+
+            _mediabunnyFrame = document.createElement("iframe");
+            _mediabunnyFrame.src = chrome.runtime.getURL("mediabunny.html?embed=1");
+            _mediabunnyFrame.setAttribute("aria-hidden", "true");
+            _mediabunnyFrame.style.cssText = [
+                "position:fixed",
+                "right:0",
+                "bottom:0",
+                "width:0",
+                "height:0",
+                "border:0",
+                "opacity:0",
+                "pointer-events:none",
+                "z-index:-2147483648"
+            ].join(";");
+            _mediabunnyFrame.onload = function () {
+                _mediabunnyFrameReady = true;
+                _mediabunnyFrameCallbacks.splice(0).forEach(function (callback) { callback(); });
+                while (_mediabunnyFrameQueue.length) {
+                    _mediabunnyFrame.contentWindow.postMessage(_mediabunnyFrameQueue.shift(), "*");
+                }
+            };
+
+            appendMediabunnyFrame();
+        });
+    }
+
+    function appendMediabunnyFrame() {
+        const root = document.documentElement || document.body;
+        if (!root) {
+            setTimeout(appendMediabunnyFrame, 50);
+            return;
+        }
+        root.appendChild(_mediabunnyFrame);
+    }
+
+    async function postMediabunnyJob(message) {
+        const job = await prepareMediabunnyJob(message);
+        await ensureMediabunnyFrame();
+        if (_mediabunnyFrameReady && _mediabunnyFrame?.contentWindow) {
+            _mediabunnyFrame.contentWindow.postMessage(job, "*");
+            return;
+        }
+        _mediabunnyFrameQueue.push(job);
+    }
+
+    async function prepareMediabunnyJob(message) {
+        const job = { ...message };
+        job.Message ??= "catCatchFFmpeg";
+        job.action ??= job.use;
+        if (!Array.isArray(job.files)) {
+            return job;
+        }
+
+        job.quantity = Math.max(parseInt(job.quantity ?? job.files.length, 10) || job.files.length || 1, job.files.length || 1);
+        job.files = await Promise.all(job.files.map(async function (file, index) {
+            const next = {
+                ...file,
+                index: file.index ?? job.index ?? index,
+                type: file.type ?? job.type,
+            };
+            if (typeof next.data == "string") {
+                try {
+                    const response = await fetch(next.data);
+                    if (response.ok) {
+                        next.data = await response.blob();
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+            return next;
+        }));
+        return job;
+    }
+
     chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         if (chrome.runtime.lastError) { return; }
         // 获取页面视频对象
@@ -137,27 +226,12 @@
             return true;
         }
         if (Message.Message == "ffmpeg") {
-            if (!Message.files) {
-                window.postMessage(Message);
-                sendResponse("ok");
-                return true;
-            }
-            Message.quantity ??= Message.files.length;
-            for (let item of Message.files) {
-                const data = { ...Message, ...item };
-                data.type = item.type ?? "video";
-                if (data.data instanceof Blob) {
-                    window.postMessage(data);
-                } else {
-                    fetch(data.data)
-                        .then(response => response.blob())
-                        .then(blob => {
-                            data.data = blob;
-                            window.postMessage(data);
-                        });
-                }
-            }
-            sendResponse("ok");
+            postMediabunnyJob(Message)
+                .then(function () { sendResponse("ok"); })
+                .catch(function (error) {
+                    console.log(error);
+                    sendResponse({ error: String(error) });
+                });
             return true;
         }
         if (Message.Message == "getPage") {
@@ -228,7 +302,7 @@
         if (event.data.action == "catCatchFFmpeg") {
             if (!event.data.use ||
                 !event.data.files ||
-                !event.data.files instanceof Array ||
+                !(event.data.files instanceof Array) ||
                 event.data.files.length == 0
             ) { return; }
             event.data.title = event.data.title ?? document.title ?? new Date().getTime().toString();
@@ -240,7 +314,9 @@
                 url: event.data.href ?? event.source.location.href,
             };
             data = { ...event.data, ...data };
-            chrome.runtime.sendMessage(data);
+            postMediabunnyJob(data).catch(function (error) {
+                console.log(error);
+            });
         }
         if (event.data.action == "catCatchFFmpegResult") {
             if (!event.data.state || !event.data.tabId) { return; }

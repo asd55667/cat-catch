@@ -522,7 +522,7 @@
     "message": "Carpeta descarga"
   },
   "sendFfmpeg": {
-    "message": "Enviar a ffmpeg en línea"
+    "message": "Send to local muxer"
   },
   "autoCloserDownload": {
     "message": "Cerrar automáticamente la página tras la descarga"

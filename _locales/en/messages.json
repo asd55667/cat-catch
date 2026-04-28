@@ -522,7 +522,7 @@
     "message": "Download Directory"
   },
   "sendFfmpeg": {
-    "message": "Send to Online ffmpeg"
+    "message": "Send to local muxer"
   },
   "autoCloserDownload": {
     "message": "Automatically Close Page After Download"
@@ -1020,12 +1020,12 @@
     "message": "This site requires blocking the operation of this extension"
   },
   "onlineFFmpeg": {
-    "message": "Online FFmpeg"
+    "message": "Local muxer"
   },
   "ffmpegIsNotReady": {
-    "message": "Online FFmpeg service is not ready, please try again later"
+    "message": "Local muxer is not ready, please try again later"
   },
   "iframeFFmpeg": {
-    "message": "Use iframe to call FFmpeg"
+    "message": "Use local inline muxer"
   }
 }

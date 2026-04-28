@@ -687,10 +687,6 @@ if (G.isFirefox) {
 // 跳转页面
 $("[go]").click(function () {
     let url = this.getAttribute("go");
-    if (url == "ffmpegURL") {
-        chrome.tabs.create({ url: G.ffmpegConfig.url })
-        return;
-    }
     chrome.tabs.create({ url: url });
 });
 // 暂停 启用

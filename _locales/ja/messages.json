@@ -522,7 +522,7 @@
     "message": "ダウンロードフォルダ"
   },
   "sendFfmpeg": {
-    "message": "オンラインffmpeg送信"
+    "message": "Send to local muxer"
   },
   "autoCloserDownload": {
     "message": "ダウンロード後自動クローズ"
