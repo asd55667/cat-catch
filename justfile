@@ -4,7 +4,8 @@
 set shell := ["bash", "-c"]
 
 artifact := "cat-catch-custom"
-key_file := "cat-catch-custom.pem"
+# 签名私钥放在扩展目录外，避免加载 unpacked 扩展时被 Chrome 扫描到。
+key_file := "../cat-catch-custom.pem"
 
 # 默认任务：显示帮助
 default:

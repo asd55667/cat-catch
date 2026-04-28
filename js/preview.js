@@ -1,3 +1,19 @@
+function safePlay(video) {
+    if (!video?.play) { return; }
+    try {
+        const playPromise = video.play();
+        playPromise?.catch?.(function (error) {
+            if (error?.name != "AbortError") {
+                console.log(error);
+            }
+        });
+    } catch (error) {
+        if (error?.name != "AbortError") {
+            console.log(error);
+        }
+    }
+}
+
 class FilePreview {
 
     MAX_CONCURRENT = 16;   // 最大并行生成预览数
@@ -659,12 +675,12 @@ class FilePreview {
             });
             this.previewHLS.on(Hls.Events.MEDIA_ATTACHED, () => {
                 container.classList.remove('hide');
-                video.play();
+                safePlay(video);
             });
         } else {
             video.src = item.url;
             container.classList.remove('hide');
-            video.play();
+            safePlay(video);
         }
     }
     /**
@@ -758,7 +774,7 @@ class FilePreview {
             container.appendChild(item.previewVideo.video);
             // 鼠标悬停事件
             item.html.addEventListener('mouseenter', () => {
-                item.previewVideo.video.play();
+                safePlay(item.previewVideo.video);
             });
             item.html.addEventListener('mouseleave', () => {
                 item.previewVideo.video.pause();

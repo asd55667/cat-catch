@@ -3,6 +3,22 @@
     if (document.getElementById("catCatchRecorder")) { return; }
     const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
 
+    function safePlay(video) {
+        if (!video?.play) { return; }
+        try {
+            const playPromise = video.play();
+            playPromise?.catch?.(function (error) {
+                if (error?.name != "AbortError") {
+                    console.log(error);
+                }
+            });
+        } catch (error) {
+            if (error?.name != "AbortError") {
+                console.log(error);
+            }
+        }
+    }
+
     // let language = "en";
     let language = navigator.language.replace("-", "_");
     if (window.CatCatchI18n) {
@@ -300,7 +316,7 @@
                 console.log(e);
                 return;
             }
-            videoList[index].play();
+            safePlay(videoList[index]);
             setTimeout(() => {
                 if (recorder.state === 'recording') {
                     $stop.style.display = 'inline';

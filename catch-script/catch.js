@@ -1,4 +1,20 @@
 (function () {
+    function safePlay(video) {
+        if (!video?.play) { return; }
+        try {
+            const playPromise = video.play();
+            playPromise?.catch?.(function (error) {
+                if (error?.name != "AbortError") {
+                    console.log(error);
+                }
+            });
+        } catch (error) {
+            if (error?.name != "AbortError") {
+                console.log(error);
+            }
+        }
+    }
+
     class CatCatcher {
         constructor() {
             console.log("catch.js Start");
@@ -451,7 +467,7 @@
             this.clearCache();
             document.querySelectorAll("video").forEach((element) => {
                 element.currentTime = 0;
-                element.play();
+                safePlay(element);
             });
         }
 

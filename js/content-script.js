@@ -7,6 +7,22 @@
     var _mediabunnyFrameCallbacks = [];
     var _mediabunnyFrameQueue = [];
 
+    function safePlay(video) {
+        if (!video?.play) { return; }
+        try {
+            const playPromise = video.play();
+            playPromise?.catch?.(function (error) {
+                if (error?.name != "AbortError") {
+                    console.log(error);
+                }
+            });
+        } catch (error) {
+            if (error?.name != "AbortError") {
+                console.log(error);
+            }
+        }
+    }
+
     function ensureMediabunnyFrame() {
         return new Promise(function (resolve) {
             if (_mediabunnyFrameReady && _mediabunnyFrame?.contentWindow) {
@@ -172,7 +188,7 @@
         }
         // 播放
         if (Message.Message == "play") {
-            _videoObj[Message.index].play();
+            safePlay(_videoObj[Message.index]);
             return true;
         }
         // 暂停
