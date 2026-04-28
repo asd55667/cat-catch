@@ -20,15 +20,15 @@ window.addEventListener('DOMContentLoaded', function () {
         // 更新动态文本
         if (lang === 'en') {
             document.getElementById('main-title').textContent = 'Installation Successful!';
-            document.getElementById('subtitle').textContent = 'Cat Catch Extension is now installed';
-            document.getElementById('welcome-title').textContent = 'Welcome to Cat Catch';
+            document.getElementById('subtitle').textContent = 'Cat Catch Custom Extension is now installed';
+            document.getElementById('welcome-title').textContent = 'Welcome to Cat Catch Custom';
             document.getElementById('privacy-title').textContent = 'Privacy Policy';
             document.getElementById('disclaimer-title').textContent = 'Disclaimer';
             document.getElementById('issue-title').textContent = 'Issue Submission';
             document.getElementById('agreeText').textContent = 'Agree';
             document.getElementById('uninstallText').textContent = 'Uninstall Extension';
         } else {
-            document.getElementById('main-title').textContent = '恭喜 猫抓 扩展已成功安装 !';
+            document.getElementById('main-title').textContent = '恭喜 猫抓定制版 扩展已成功安装 !';
             document.getElementById('subtitle').textContent = 'Installation successful !';
             document.getElementById('welcome-title').textContent = '希望本扩展能帮助到你';
             document.getElementById('privacy-title').textContent = '隐私政策 / Privacy Policy';

@@ -1,6 +1,6 @@
 {
   "catCatch": {
-    "message": "cat-catch"
+    "message": "cat-catch-custom"
   },
   "description": {
     "message": "ウェブメディア探す TOOL"
@@ -177,19 +177,19 @@
     "message": "オプション"
   },
   "titleOption": {
-    "message": "cat-catch 設定"
+    "message": "cat-catch-custom 設定"
   },
   "titleDownload": {
-    "message": "cat-catch ダウンローダー"
+    "message": "cat-catch-custom ダウンローダー"
   },
   "titleM3U8": {
-    "message": "cat-catch M3U8パーサー"
+    "message": "cat-catch-custom M3U8パーサー"
   },
   "titleJson": {
-    "message": "cat-catch JSONフォーマット"
+    "message": "cat-catch-custom JSONフォーマット"
   },
   "titledash": {
-    "message": "cat-catch DASHパーサー"
+    "message": "cat-catch-custom DASHパーサー"
   },
   "suffix": {
     "message": "サフィックス"
@@ -327,7 +327,7 @@
     "message": "空欄でブラウザデフォルトUser Agent使用"
   },
   "alwaysDisableCatCatcher": {
-    "message": "常にcat-catchダウンローダー無効"
+    "message": "常にcat-catch-customダウンローダー無効"
   },
   "autoClosePageAfterDownload": {
     "message": "ダウンロード後自動クローズ"

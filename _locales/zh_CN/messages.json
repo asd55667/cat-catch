@@ -1,6 +1,6 @@
 {
   "catCatch": {
-    "message": "猫抓"
+    "message": "猫抓定制版"
   },
   "description": {
     "message": "网页媒体嗅探工具"
@@ -177,19 +177,19 @@
     "message": "选项"
   },
   "titleOption": {
-    "message": "猫抓 设置"
+    "message": "猫抓定制版 设置"
   },
   "titleDownload": {
-    "message": "猫抓 下载器"
+    "message": "猫抓定制版 下载器"
   },
   "titleM3U8": {
-    "message": "猫抓 M3U8解析器"
+    "message": "猫抓定制版 M3U8解析器"
   },
   "titleJson": {
-    "message": "猫抓 json格式化"
+    "message": "猫抓定制版 json格式化"
   },
   "titledash": {
-    "message": "猫抓 dash解析器"
+    "message": "猫抓定制版 dash解析器"
   },
   "suffix": {
     "message": "后缀"
@@ -327,7 +327,7 @@
     "message": "留空默认为当前浏览器 User Agent"
   },
   "alwaysDisableCatCatcher": {
-    "message": "始终不启用猫抓下载器"
+    "message": "始终不启用猫抓定制版下载器"
   },
   "autoClosePageAfterDownload": {
     "message": "下载完自动关闭页面"

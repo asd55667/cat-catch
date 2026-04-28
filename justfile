@@ -3,6 +3,9 @@
 # 设置默认shell为bash
 set shell := ["bash", "-c"]
 
+artifact := "cat-catch-custom"
+key_file := "cat-catch-custom.pem"
+
 # 默认任务：显示帮助
 default:
     @just --list
@@ -15,7 +18,11 @@ install:
 # 清理构建目录
 clean:
     rm -rf build dist web-ext-artifacts
-    rm -f *.crx *.zip private-key.pem
+    rm -f *.crx *.zip
+
+# 删除本地扩展签名私钥（会导致下一次构建产生新的 Chromium 扩展 ID）
+clean-key:
+    rm -f {{key_file}}
 
 # 验证manifest文件
 validate:
@@ -23,11 +30,13 @@ validate:
     @node -e "const manifest = require('./manifest.json'); console.log('Extension name:', manifest.name); console.log('Version:', manifest.version); if (!manifest.manifest_version || !manifest.name || !manifest.version) { throw new Error('Invalid manifest.json'); }"
 
 # 准备构建目录
-prepare: validate
+prepare: validate generate-key
     @echo "准备构建目录..."
     mkdir -p build
     cp -r ./{catch-script,css,img,js,lib,_locales} build/
-    cp -r ./*.{js,html} build/
+    cp -r ./*.html build/
+    cp manifest.json build/
+    @node -e 'const fs = require("fs"); const crypto = require("crypto"); const manifestPath = "build/manifest.json"; const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8")); manifest.key = crypto.createPublicKey(fs.readFileSync("{{key_file}}")).export({ type: "spki", format: "der" }).toString("base64"); fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n");'
     @echo "✅ 文件复制完成"
 
 # 检查图标文件
@@ -41,27 +50,31 @@ check-icons:
 # 生成私钥
 generate-key:
     @echo "生成私钥..."
-    @if [ ! -f "private-key.pem" ]; then \
-        openssl genrsa -out private-key.pem 2048; \
+    @if [ ! -f "{{key_file}}" ]; then \
+        openssl genrsa -out "{{key_file}}" 2048; \
         echo "✅ 私钥已生成"; \
     else \
         echo "✅ 私钥已存在"; \
     fi
+
+# 显示当前本地 Chromium 扩展 ID
+extension-id: generate-key
+    @node -e 'const fs = require("fs"); const crypto = require("crypto"); const pub = crypto.createPublicKey(fs.readFileSync("{{key_file}}")).export({ type: "spki", format: "der" }); const hex = crypto.createHash("sha256").update(pub).digest("hex").slice(0, 32); const id = hex.replace(/[0-9a-f]/g, c => String.fromCharCode(97 + parseInt(c, 16))); console.log("Chromium extension ID:", id);'
 
 # 构建ZIP文件
 build-zip: prepare check-icons
     @echo "构建 ZIP 文件..."
     @cd build && \
         VERSION=$(node -p "require('./manifest.json').version") && \
-        zip -r "../cat-catch${VERSION}.zip" . && \
-        echo "✅ ZIP 文件已生成: cat-catch${VERSION}.zip"
+        zip -r "../{{artifact}}${VERSION}.zip" . && \
+        echo "✅ ZIP 文件已生成: {{artifact}}${VERSION}.zip"
 
 # 构建CRX文件
 build-crx: prepare check-icons generate-key
     @echo "构建 CRX 文件..."
     @VERSION=$(node -p "require('./manifest.json').version") && \
-    crx3 -p private-key.pem -o "cat-catch${VERSION}.crx" build/ && \
-    echo "✅ CRX 文件已生成: cat-catch${VERSION}.crx"
+    crx3 -p "{{key_file}}" -o "{{artifact}}${VERSION}.crx" build/ && \
+    echo "✅ CRX 文件已生成: {{artifact}}${VERSION}.crx"
 
 # 快速构建（仅ZIP）
 quick: build-zip

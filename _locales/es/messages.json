@@ -1,6 +1,6 @@
 {
   "catCatch": {
-    "message": "cat-catch"
+    "message": "cat-catch-custom"
   },
   "description": {
     "message": "Herramienta de rastreo de medios web"
@@ -177,19 +177,19 @@
     "message": "Opciones"
   },
   "titleOption": {
-    "message": "Opciones cat-catch"
+    "message": "Opciones cat-catch-custom"
   },
   "titleDownload": {
-    "message": "Descargar con cat-catch"
+    "message": "Descargar con cat-catch-custom"
   },
   "titleM3U8": {
-    "message": "Analizar m3u8 con cat-catch"
+    "message": "Analizar m3u8 con cat-catch-custom"
   },
   "titleJson": {
-    "message": "Formateador json con cat-catch"
+    "message": "Formateador json con cat-catch-custom"
   },
   "titledash": {
-    "message": "Analizar dash con cat-catch"
+    "message": "Analizar dash con cat-catch-custom"
   },
   "suffix": {
     "message": "Sufijo"
@@ -327,7 +327,7 @@
     "message": "Predeterminado, agente usuario del navegador actual"
   },
   "alwaysDisableCatCatcher": {
-    "message": "Desactivar siempre descargador Cat-Catch"
+    "message": "Desactivar siempre descargador Cat-Catch Custom"
   },
   "autoClosePageAfterDownload": {
     "message": "Cerrar la página después de descargar"

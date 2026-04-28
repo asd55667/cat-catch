@@ -1,6 +1,6 @@
 {
   "catCatch": {
-    "message": "cat-catch"
+    "message": "cat-catch-custom"
   },
   "description": {
     "message": "Web medya sniffer aracı"
@@ -177,19 +177,19 @@
     "message": "Seçenek"
   },
   "titleOption": {
-    "message": "cat-catch Seçeneği"
+    "message": "cat-catch-custom Seçeneği"
   },
   "titleDownload": {
-    "message": "cat-catch İndir"
+    "message": "cat-catch-custom İndir"
   },
   "titleM3U8": {
-    "message": "cat-catch m3u8 Ayrıştırıcısı"
+    "message": "cat-catch-custom m3u8 Ayrıştırıcısı"
   },
   "titleJson": {
-    "message": "cat-catch json biçimlendirici"
+    "message": "cat-catch-custom json biçimlendirici"
   },
   "titledash": {
-    "message": "cat-catch Dash Ayrıştırıcısı"
+    "message": "cat-catch-custom Dash Ayrıştırıcısı"
   },
   "suffix": {
     "message": "Eki"
@@ -327,7 +327,7 @@
     "message": "Varsayılan olarak geçerli tarayıcının Kullanıcı Aracısı"
   },
   "alwaysDisableCatCatcher": {
-    "message": "Her Zaman Cat-Catch İndiriciyi Devre Dışı Bırak"
+    "message": "Her Zaman Cat-Catch Custom İndiriciyi Devre Dışı Bırak"
   },
   "autoClosePageAfterDownload": {
     "message": "İndirmeden Sonra Sayfayı Otomatik Kapat"

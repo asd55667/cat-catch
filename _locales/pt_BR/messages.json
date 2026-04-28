@@ -1,6 +1,6 @@
 {
   "catCatch": {
-    "message": "cat-catch"
+    "message": "cat-catch-custom"
   },
   "description": {
     "message": "Ferramenta de detecção de mídia da web"
@@ -327,7 +327,7 @@
     "message": "Padrão para o User Agent do navegador atual"
   },
   "alwaysDisableCatCatcher": {
-    "message": "Sempre desativar o Cat-Catch Downloader"
+    "message": "Sempre desativar o Cat-Catch Custom Downloader"
   },
   "autoClosePageAfterDownload": {
     "message": "Fechar Página Automaticamente Após Download"

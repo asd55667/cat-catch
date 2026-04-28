@@ -1,6 +1,6 @@
 {
   "catCatch": {
-    "message": "cat-catch"
+    "message": "cat-catch-custom"
   },
   "description": {
     "message": "Web media sniffing tool"
@@ -177,19 +177,19 @@
     "message": "Option"
   },
   "titleOption": {
-    "message": "cat-catch Option"
+    "message": "cat-catch-custom Option"
   },
   "titleDownload": {
-    "message": "cat-catch Download"
+    "message": "cat-catch-custom Download"
   },
   "titleM3U8": {
-    "message": "cat-catch m3u8 Parser"
+    "message": "cat-catch-custom m3u8 Parser"
   },
   "titleJson": {
-    "message": "cat-catch json formatter"
+    "message": "cat-catch-custom json formatter"
   },
   "titledash": {
-    "message": "cat-catch Dash Parser"
+    "message": "cat-catch-custom Dash Parser"
   },
   "suffix": {
     "message": "Suffix"
@@ -327,7 +327,7 @@
     "message": "Default to the current browser's User Agent"
   },
   "alwaysDisableCatCatcher": {
-    "message": "Always Disable Cat-Catch Downloader"
+    "message": "Always Disable Cat-Catch Custom Downloader"
   },
   "autoClosePageAfterDownload": {
     "message": "Automatically Close Page After Download"

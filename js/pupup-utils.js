@@ -57,7 +57,7 @@ function isMedia(data) {
 function aria2AddUri(data, success, error) {
     const json = {
         "jsonrpc": "2.0",
-        "id": "cat-catch-" + data.requestId,
+        "id": "cat-catch-custom-" + data.requestId,
         "method": "aria2.addUri",
         "params": []
     };
@@ -147,7 +147,7 @@ function connectAndSendMQTT(data, config) {
 
             // 创建 MQTT 客户端选项
             const options = {
-                clientId: `${G.mqttClientId || "cat-catch-client"}-${Math.random().toString(16).slice(2)}`,
+                clientId: `${G.mqttClientId || "cat-catch-custom-client"}-${Math.random().toString(16).slice(2)}`,
                 clean: true,
                 connectTimeout: 10000,
                 reconnectPeriod: 0 // 不自动重连，用完即断
@@ -180,7 +180,7 @@ function connectAndSendMQTT(data, config) {
             // 连接成功
             client.on('connect', () => {
 
-                const topic = G.mqttTopic || "cat-catch/media";
+                const topic = G.mqttTopic || "cat-catch-custom/media";
                 const qos = parseInt(G.mqttQos) || 2;
 
                 // 处理自定义数据格式

@@ -1,6 +1,6 @@
 {
   "catCatch": {
-    "message": "cat-catch"
+    "message": "cat-catch-custom"
   },
   "description": {
     "message": "Công cụ bắt link media trên web"
@@ -177,19 +177,19 @@
     "message": "Tùy chọn"
   },
   "titleOption": {
-    "message": "Tùy chọn cat-catch"
+    "message": "Tùy chọn cat-catch-custom"
   },
   "titleDownload": {
-    "message": "Tải xuống cat-catch"
+    "message": "Tải xuống cat-catch-custom"
   },
   "titleM3U8": {
-    "message": "Trình phân tích m3u8 cat-catch"
+    "message": "Trình phân tích m3u8 cat-catch-custom"
   },
   "titleJson": {
-    "message": "Trình định dạng json cat-catch"
+    "message": "Trình định dạng json cat-catch-custom"
   },
   "titledash": {
-    "message": "Trình phân tích Dash cat-catch"
+    "message": "Trình phân tích Dash cat-catch-custom"
   },
   "suffix": {
     "message": "Đuôi tệp"
@@ -327,7 +327,7 @@
     "message": "Mặc định sử dụng User Agent của trình duyệt hiện tại"
   },
   "alwaysDisableCatCatcher": {
-    "message": "Luôn tắt trình tải xuống Cat-Catch"
+    "message": "Luôn tắt trình tải xuống Cat-Catch Custom"
   },
   "autoClosePageAfterDownload": {
     "message": "Tự động đóng trang sau khi tải xong"

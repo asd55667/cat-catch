@@ -1,6 +1,6 @@
 {
   "catCatch": {
-    "message": "貓抓"
+    "message": "貓抓自訂版"
   },
   "description": {
     "message": "網頁媒體嗅探工具"
@@ -177,19 +177,19 @@
     "message": "選項"
   },
   "titleOption": {
-    "message": "貓抓 設定"
+    "message": "貓抓自訂版 設定"
   },
   "titleDownload": {
-    "message": "貓抓 下載器"
+    "message": "貓抓自訂版 下載器"
   },
   "titleM3U8": {
-    "message": "貓抓 M3U8解析器"
+    "message": "貓抓自訂版 M3U8解析器"
   },
   "titleJson": {
-    "message": "貓抓 json格式化"
+    "message": "貓抓自訂版 json格式化"
   },
   "titledash": {
-    "message": "貓抓 dash解析器"
+    "message": "貓抓自訂版 dash解析器"
   },
   "suffix": {
     "message": "後綴"
@@ -327,7 +327,7 @@
     "message": "留空預設為目前瀏覽器 User Agent"
   },
   "alwaysDisableCatCatcher": {
-    "message": "永遠不啟用貓抓下載器"
+    "message": "永遠不啟用貓抓自訂版下載器"
   },
   "autoClosePageAfterDownload": {
     "message": "下載完自動關閉頁面"
