@@ -477,6 +477,15 @@ function clearRedundant() {
         });
         autoDownFlag && (chrome.storage.session ?? chrome.storage.local).set({ featAutoDownTabId: Array.from(G.featAutoDownTabId) });
 
+        let catchFlag = false;
+        G.featCatchTabId.forEach(function (tabId) {
+            if (!allTabId.has(tabId)) {
+                catchFlag = true;
+                G.featCatchTabId.delete(tabId);
+            }
+        });
+        catchFlag && (chrome.storage.session ?? chrome.storage.local).set({ featCatchTabId: Array.from(G.featCatchTabId) });
+
         G.blockUrlSet = new Set([...G.blockUrlSet].filter(x => allTabId.has(x)));
         G.damnUrlSet = new Set([...G.damnUrlSet].filter(x => allTabId.has(x)));
 

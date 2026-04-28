@@ -753,6 +753,15 @@ async function getPageDOM() {
         return null;
     }
 }
+
+function activateCurrentTabCatch() {
+    return new Promise(function (resolve) {
+        chrome.runtime.sendMessage(chrome.runtime.id, { Message: "activateCatch", tabId: G.tabId }, function () {
+            resolve();
+        });
+    });
+}
+
 // 一些需要等待G变量加载完整的操作
 const interval = setInterval(async function () {
     if (!G.initSyncComplete || !G.initLocalComplete || !G.tabId) { return; }
@@ -771,6 +780,8 @@ const interval = setInterval(async function () {
         $("#popup").hide();
         _type == "window" && $("#currentPage").show();
     }
+
+    await activateCurrentTabCatch();
 
     // 获取页面DOM
     if (G.getHtmlDOM) {

@@ -66,6 +66,30 @@ function queueFfmpegJob(data, active = true, sender = null) {
     ensureFfmpegRunner(active);
 }
 
+function getActivatedCatchTabId(tabId, allowActiveFallback = false) {
+    tabId = Number(tabId);
+    if (tabId > 0) { return tabId; }
+    return allowActiveFallback && G.tabId > 0 ? G.tabId : 0;
+}
+
+function isCatchActivated(tabId) {
+    tabId = getActivatedCatchTabId(tabId);
+    return tabId > 0 && G.featCatchTabId?.has(tabId);
+}
+
+function shouldCaptureRequest(data) {
+    if (!G || !G.initSyncComplete || !G.initLocalComplete || !G.enable) { return false; }
+    return isCatchActivated(data?.tabId);
+}
+
+function activateCatch(tabId) {
+    tabId = getActivatedCatchTabId(tabId, true);
+    if (!tabId) { return false; }
+    G.featCatchTabId.add(tabId);
+    (chrome.storage.session ?? chrome.storage.local).set({ featCatchTabId: Array.from(G.featCatchTabId) });
+    return true;
+}
+
 /**
  *  定时任务
  *  nowClear clear 清理冗余数据
@@ -91,7 +115,7 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
 // 保存requestHeaders
 chrome.webRequest.onSendHeaders.addListener(
     function (data) {
-        if (G && G.initSyncComplete && !G.enable) { return; }
+        if (!shouldCaptureRequest(data)) { return; }
         if (data.requestHeaders) {
             G.requestHeaders.set(data.requestId, data.requestHeaders);
             data.allRequestHeaders = data.requestHeaders;
@@ -104,6 +128,10 @@ chrome.webRequest.onSendHeaders.addListener(
 chrome.webRequest.onResponseStarted.addListener(
     function (data) {
         try {
+            if (!shouldCaptureRequest(data)) {
+                G.requestHeaders.delete(data.requestId);
+                return;
+            }
             data.allRequestHeaders = G.requestHeaders.get(data.requestId);
             if (data.allRequestHeaders) {
                 G.requestHeaders.delete(data.requestId);
@@ -133,6 +161,12 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
     if (G.damn && G.damnUrlSet.has(data.tabId)) {
         return;
     }
+
+    const catchTabId = getActivatedCatchTabId(data.tabId, true);
+    if (!isCatchActivated(catchTabId)) {
+        return;
+    }
+    data.tabId = catchTabId;
 
     // 检查 是否启用 是否在当前标签是否在屏蔽列表中
     const blockUrlFlag = data.tabId && data.tabId > 0 && G.blockUrlSet.has(data.tabId);
@@ -392,6 +426,11 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         sendResponse("ok");
         return true;
     }
+    // 用户打开扩展入口后，才激活当前标签的资源嗅探
+    if (Message.Message == "activateCatch") {
+        sendResponse(activateCatch(Message.tabId) ? "ok" : "error");
+        return true;
+    }
     // 启用/禁用扩展
     if (Message.Message == "enable") {
         G.enable = !G.enable;
@@ -453,6 +492,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // 对tabId的标签 开启 关闭 自动下载
     if (Message.Message == "autoDown") {
+        activateCatch(Message.tabId);
         if (G.featAutoDownTabId.has(Message.tabId)) {
             G.featAutoDownTabId.delete(Message.tabId);
         } else {
@@ -484,6 +524,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             return true;
         }
         scriptTabid.add(Message.tabId);
+        activateCatch(Message.tabId);
         if (refresh) {
             chrome.tabs.reload(Message.tabId, { bypassCache: true });
         } else {
@@ -733,6 +774,10 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
         !alarm && chrome.alarms.create("nowClear", { when: Date.now() + 1000 });
     });
     if (G.initSyncComplete) {
+        if (G.featCatchTabId.has(tabId)) {
+            G.featCatchTabId.delete(tabId);
+            (chrome.storage.session ?? chrome.storage.local).set({ featCatchTabId: Array.from(G.featCatchTabId) });
+        }
         G.blockUrlSet.has(tabId) && G.blockUrlSet.delete(tabId);
         G.damnUrlSet.has(tabId) && G.damnUrlSet.delete(tabId);
     }
@@ -743,6 +788,7 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
  */
 chrome.commands.onCommand.addListener(function (command) {
     if (command == "auto_down") {
+        activateCatch(G.tabId);
         if (G.featAutoDownTabId.has(G.tabId)) {
             G.featAutoDownTabId.delete(G.tabId);
         } else {
@@ -750,6 +796,7 @@ chrome.commands.onCommand.addListener(function (command) {
         }
         (chrome.storage.session ?? chrome.storage.local).set({ featAutoDownTabId: Array.from(G.featAutoDownTabId) });
     } else if (command == "catch") {
+        activateCatch(G.tabId);
         const scriptTabid = G.scriptList.get("catch.js").tabId;
         scriptTabid.has(G.tabId) ? scriptTabid.delete(G.tabId) : scriptTabid.add(G.tabId);
         chrome.tabs.reload(G.tabId, { bypassCache: true });
@@ -767,6 +814,7 @@ chrome.commands.onCommand.addListener(function (command) {
     } else if (command == "reboot") {
         chrome.runtime.reload();
     } else if (command == "deepSearch") {
+        activateCatch(G.tabId);
         const script = G.scriptList.get("search.js");
         const scriptTabid = script.tabId;
         if (scriptTabid.has(G.tabId)) {

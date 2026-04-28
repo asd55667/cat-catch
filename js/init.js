@@ -198,6 +198,7 @@ G.OptionLists = {
 
 // 本地储存的配置
 G.LocalVar = {
+    featCatchTabId: [],
     featMobileTabId: [],
     featAutoDownTabId: [],
     mediaControl: { tabid: 0, index: -1 },
@@ -356,6 +357,7 @@ function InitOptions() {
     });
     // 读取local配置数据 交给全局变量G
     (chrome.storage.session ?? chrome.storage.local).get(G.LocalVar, function (items) {
+        items.featCatchTabId = new Set(items.featCatchTabId);
         items.featMobileTabId = new Set(items.featMobileTabId);
         items.featAutoDownTabId = new Set(items.featAutoDownTabId);
         G = { ...items, ...G };
@@ -406,7 +408,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
             });
             continue;
         }
-        if (key == "featMobileTabId" || key == "featAutoDownTabId") {
+        if (key == "featCatchTabId" || key == "featMobileTabId" || key == "featAutoDownTabId") {
             G[key] = new Set(newValue);
             continue;
         }
