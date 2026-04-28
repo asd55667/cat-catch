@@ -217,9 +217,8 @@ class FilePreview {
         // 都是m3u8 自动合并并发送到ffmpeg
         if (checkedData.every(data => isM3U8(data))) {
             const taskId = Date.parse(new Date());
-            checkedData.forEach((data, index) => {
-                this.openM3U8(data, { ffmpeg: "merge", quantity: checkedData.length, taskId: taskId, autoDown: true, autoClose: true, isMaster: index === 0 });
-            });
+            const [first, second] = checkedData;
+            this.openM3U8(first, { ffmpeg: "merge", quantity: second ? 2 : 1, taskId: taskId, autoDown: true, autoClose: true, isMaster: true, ...(second ? { mergePeerUrl: second.url } : {}) });
             return;
         }
         this.catDownload(checkedData, { ffmpeg: "merge" });

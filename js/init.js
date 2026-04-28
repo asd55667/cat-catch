@@ -163,11 +163,11 @@ G.OptionLists = {
     invokeConfirm: false,
     // m3u8解析器默认参数
     M3u8Thread: 6,
-    M3u8Mp4: false,
+    M3u8Mp4: true,
     M3u8OnlyAudio: false,
     M3u8SkipDecrypt: false,
-    M3u8StreamSaver: false,
-    M3u8Ffmpeg: true,
+    M3u8StreamSaver: true,
+    M3u8Ffmpeg: false,
     M3u8AutoClose: false,
     // 第三方服务地址
     onlineServiceAddress: 0,
@@ -331,6 +331,16 @@ function InitOptions() {
         if (typeof items.m3u8dl == 'boolean') {
             items.m3u8dl = items.m3u8dl ? 1 : 0;
             chrome.storage.sync.set({ m3u8dl: items.m3u8dl });
+        }
+        if (items.M3u8Ffmpeg === true && items.M3u8Mp4 === false && items.M3u8StreamSaver === false && items.M3u8OnlyAudio === false && items.M3u8AutoClose === false) {
+            items.M3u8Mp4 = true;
+            items.M3u8StreamSaver = true;
+            items.M3u8Ffmpeg = false;
+            chrome.storage.sync.set({
+                M3u8Mp4: items.M3u8Mp4,
+                M3u8StreamSaver: items.M3u8StreamSaver,
+                M3u8Ffmpeg: items.M3u8Ffmpeg
+            });
         }
         if (!items.iframeFFmpeg) {
             items.iframeFFmpeg = true;

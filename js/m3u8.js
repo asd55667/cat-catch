@@ -12,6 +12,7 @@ const key = params.get("key");  // 自定义密钥
 let autoDown = params.get("autoDown");  //是否自动下载
 const autoClose = params.get("autoClose");  // 下载完是否关闭页面
 let retryCount = parseInt(params.get("retryCount"));  // 重试次数
+const _mergePeerUrl = params.get("mergePeerUrl");  // 单页合并时隐藏解析的另一路m3u8
 
 const _isMaster = params.get("isMaster");   // 是否为主任务
 
@@ -108,6 +109,7 @@ let iframeFFmpegReadyRetryCount = 0;
 
 // 自动合并
 let autoMergeTimer = null;
+let mergePeerParserCreated = false;
 
 /**
  * 初始化函数，界面默认配置 loadSource载入 m3u8 url
@@ -148,6 +150,8 @@ function init() {
 
     // 发送到ffmpeg取消边下边存设置
     _ffmpeg && $("#StreamSaver").prop("checked", false);
+
+    createMergePeerParser();
 
     // 存在密钥参数 自动填写密钥
     key && $("#customKey").val(key);
@@ -413,8 +417,7 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
                     requestHeaders: requestHeaders,
                 }
                 const options = { ffmpeg: "merge", quantity: 2, taskId: taskId, autoDown: true, autoClose: true };
-                openParser({ ...data, url: dataMerge.audio.url }, { ...options, isMaster: true });
-                openParser({ ...data, url: dataMerge.video.url }, { ...options, isMaster: false });
+                openParser({ ...data, url: dataMerge.video.url }, { ...options, isMaster: true, mergePeerUrl: dataMerge.audio.url });
             }
         });
     } else {
@@ -1729,6 +1732,31 @@ function initDownload() {
         item.querySelector(".stop")?.remove();
         item.querySelector(".retry")?.remove();
     });
+}
+
+function createMergePeerParser() {
+    if (!_mergePeerUrl || _isMaster != 1 || !_taskId || mergePeerParserCreated) { return; }
+    mergePeerParserCreated = true;
+
+    const search = new URLSearchParams({
+        url: _mergePeerUrl,
+        title: _title ?? "",
+        filename: _fileName ?? "",
+        tabid: tabId || currentTabId || "",
+        initiator: _initiator ?? "",
+        requestHeaders: _requestHeaders ?? "",
+        ffmpeg: "merge",
+        quantity: "2",
+        taskId: _taskId,
+        autoDown: "1",
+        autoClose: "1",
+        isMaster: "0",
+    });
+    const iframe = document.createElement("iframe");
+    iframe.src = `/m3u8.html?${search.toString()}`;
+    iframe.setAttribute("aria-hidden", "true");
+    iframe.style.cssText = "display:none;width:0;height:0;border:0;";
+    document.body.appendChild(iframe);
 }
 
 // 流式下载
