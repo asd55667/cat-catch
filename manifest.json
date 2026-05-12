@@ -4,7 +4,7 @@
   },
   "action": {
     "default_icon": "img/icon.png",
-    "default_title": "__MSG_catCatch__",
+    "default_title": "wcw__MSG_catCatch__",
     "default_popup": "popup.html"
   },
   "side_panel": {
@@ -17,7 +17,7 @@
   },
   "manifest_version": 3,
   "minimum_chrome_version": "93",
-  "name": "__MSG_catCatch__",
+  "name": "wcw__MSG_catCatch__",
   "homepage_url": "https://github.com/xifangczy/cat-catch",
   "options_ui": {
     "page": "options.html",
@@ -86,6 +86,6 @@
     }
   ],
   "default_locale": "en",
-  "version": "2.6.7",
+  "version": "1.0.0",
   "incognito": "split"
 }
